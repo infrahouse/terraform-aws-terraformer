@@ -7,12 +7,22 @@ module "userdata" {
     "make",
     "python-is-python3"
   ]
-  extra_repos = {
-    hashicorp : {
-      source : "deb [signed-by=$KEY_FILE]  https://apt.releases.hashicorp.com ${var.ubuntu_codename} main"
-      key : file("${path.module}/files/DEB-GPG-KEY-hashicorp")
-    }
-  }
+  extra_files = var.extra_files
+  extra_repos = merge(
+    {
+      hashicorp : {
+        source : "deb [signed-by=$KEY_FILE]  https://apt.releases.hashicorp.com ${var.ubuntu_codename} main"
+        key : file("${path.module}/files/DEB-GPG-KEY-hashicorp")
+      }
+    },
+    var.extra_repos
+  )
+  puppet_debug_logging     = var.puppet_debug_logging
+  puppet_environmentpath   = var.puppet_environmentpath
+  puppet_hiera_config_path = var.puppet_hiera_config_path
+  puppet_manifest          = var.puppet_manifest
+  puppet_module_path       = var.puppet_module_path
+  puppet_root_directory    = var.puppet_root_directory
 }
 
 resource "aws_instance" "terraformer" {
