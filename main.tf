@@ -44,4 +44,9 @@ resource "aws_instance" "terraformer" {
     },
     local.tags
   )
+  lifecycle {
+    replace_triggered_by = [
+      aws_instance.terraformer.user_data_base64
+    ]
+  }
 }
