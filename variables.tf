@@ -35,6 +35,12 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
+variable "packages" {
+  description = "List of packages to install when the instances bootstraps."
+  type        = list(string)
+  default     = []
+}
+
 variable "puppet_debug_logging" {
   description = "Enable debug logging if true."
   type        = bool

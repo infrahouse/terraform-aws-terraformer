@@ -3,10 +3,13 @@ module "userdata" {
   version     = "~> 1.6"
   environment = var.environment
   role        = "terraformer"
-  packages = [
-    "make",
-    "python-is-python3"
-  ]
+  packages = concat(
+    [
+      "make",
+      "python-is-python3"
+    ],
+    var.packages
+  )
   extra_files = var.extra_files
   extra_repos = merge(
     {
