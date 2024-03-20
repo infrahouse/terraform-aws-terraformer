@@ -11,7 +11,7 @@ Then you can specify this ARN as a role in a trust policy in the Terraform roles
 ```hcl
 module "terraformer" {
   source       = "registry.infrahouse.com/infrahouse/terraformer/aws"
-  version      = "~> 0.4"
+  version      = "~> 0.4, > 0.4.1"
   ssh_key_name = aws_key_pair.test.key_name
   zone_id      = data.aws_route53_zone.test_zone.zone_id
   subnet       = var.subnet_private_ids[0]
