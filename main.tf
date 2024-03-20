@@ -6,7 +6,8 @@ module "userdata" {
   packages = concat(
     [
       "make",
-      "python-is-python3"
+      "python-is-python3",
+      "git",
     ],
     var.packages
   )
@@ -46,7 +47,13 @@ resource "aws_instance" "terraformer" {
   )
   lifecycle {
     replace_triggered_by = [
-      module.userdata.userdata
+      null_resource.terraformer.id
     ]
+  }
+}
+
+resource "null_resource" "terraformer" {
+  triggers = {
+    userdata: module.userdata.userdata
   }
 }
