@@ -46,7 +46,7 @@ resource "aws_instance" "terraformer" {
   )
   lifecycle {
     replace_triggered_by = [
-      aws_instance.terraformer.user_data_base64
+      module.userdata.userdata
     ]
   }
 }
