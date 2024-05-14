@@ -1,3 +1,9 @@
+variable "ami" {
+  description = "Image for EC2 instances"
+  type        = string
+  default     = null
+}
+
 variable "dns_name" {
   description = "Hostname of the Terraformer in zone var.zone_id."
   type        = string
