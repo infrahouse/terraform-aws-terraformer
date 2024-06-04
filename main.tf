@@ -39,6 +39,9 @@ resource "aws_instance" "terraformer" {
     aws_security_group.terraformer.id
   ]
   iam_instance_profile = module.profile.instance_profile_name
+  root_block_device {
+    volume_size = var.root_volume_size
+  }
   tags = merge(
     {
       Name : "terraformer"
@@ -54,6 +57,6 @@ resource "aws_instance" "terraformer" {
 
 resource "null_resource" "terraformer" {
   triggers = {
-    userdata: module.userdata.userdata
+    userdata : module.userdata.userdata
   }
 }
