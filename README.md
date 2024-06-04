@@ -11,7 +11,7 @@ Then you can specify this ARN as a role in a trust policy in the Terraform roles
 ```hcl
 module "terraformer" {
   source       = "registry.infrahouse.com/infrahouse/terraformer/aws"
-  version      = "~> 0.4, > 0.4.1"
+  version      = "~> 0.5"
   ssh_key_name = aws_key_pair.test.key_name
   zone_id      = data.aws_route53_zone.test_zone.zone_id
   subnet       = var.subnet_private_ids[0]
@@ -23,13 +23,16 @@ module "terraformer" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.11, < 5.37.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.11, < 5.37.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.2.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.5.0 |
 
 ## Modules
 
@@ -48,6 +51,7 @@ module "terraformer" {
 | [aws_vpc_security_group_egress_rule.terraformer_outgoing](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.icmp](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.terraformer_ssh](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [null_resource.terraformer](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_string.profile-suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_ami.ubuntu](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
@@ -62,17 +66,20 @@ module "terraformer" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_ami"></a> [ami](#input\_ami) | Image for EC2 instances | `string` | `null` | no |
 | <a name="input_dns_name"></a> [dns\_name](#input\_dns\_name) | Hostname of the Terraformer in zone var.zone\_id. | `string` | `"terraformer"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Puppet environment. | `string` | `"development"` | no |
 | <a name="input_extra_files"></a> [extra\_files](#input\_extra\_files) | Additional files to create on an instance. | <pre>list(object({<br>    content     = string<br>    path        = string<br>    permissions = string<br>  }))</pre> | `[]` | no |
 | <a name="input_extra_repos"></a> [extra\_repos](#input\_extra\_repos) | Additional APT repositories to configure on an instance. | <pre>map(object({<br>    source = string<br>    key    = string<br>  }))</pre> | `{}` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Terraformer EC2 instance will run on this type. | `string` | `"t3.micro"` | no |
+| <a name="input_packages"></a> [packages](#input\_packages) | List of packages to install when the instances bootstraps. | `list(string)` | `[]` | no |
 | <a name="input_puppet_debug_logging"></a> [puppet\_debug\_logging](#input\_puppet\_debug\_logging) | Enable debug logging if true. | `bool` | `false` | no |
 | <a name="input_puppet_environmentpath"></a> [puppet\_environmentpath](#input\_puppet\_environmentpath) | A path for directory environments. | `string` | `"{root_directory}/environments"` | no |
 | <a name="input_puppet_hiera_config_path"></a> [puppet\_hiera\_config\_path](#input\_puppet\_hiera\_config\_path) | Path to hiera configuration file. | `string` | `"{root_directory}/environments/{environment}/hiera.yaml"` | no |
 | <a name="input_puppet_manifest"></a> [puppet\_manifest](#input\_puppet\_manifest) | Path to puppet manifest. By default ih-puppet will apply {root\_directory}/environments/{environment}/manifests/site.pp. | `string` | `null` | no |
 | <a name="input_puppet_module_path"></a> [puppet\_module\_path](#input\_puppet\_module\_path) | Path to common puppet modules. | `string` | `"{root_directory}/modules"` | no |
 | <a name="input_puppet_root_directory"></a> [puppet\_root\_directory](#input\_puppet\_root\_directory) | Path where the puppet code is hosted. | `string` | `"/opt/puppet-code"` | no |
+| <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | Disk size in GB mounted as the root volume | `number` | `8` | no |
 | <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | ssh key name installed in the Terraformer instance. | `string` | n/a | yes |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet id where the Terraformer instance will be created. | `string` | n/a | yes |
 | <a name="input_ubuntu_codename"></a> [ubuntu\_codename](#input\_ubuntu\_codename) | Ubuntu version to use for the Terraformer instance | `string` | `"jammy"` | no |

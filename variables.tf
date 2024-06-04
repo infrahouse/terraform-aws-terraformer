@@ -83,6 +83,12 @@ variable "puppet_root_directory" {
   default     = "/opt/puppet-code"
 }
 
+variable "root_volume_size" {
+  description = "Disk size in GB mounted as the root volume"
+  type        = number
+  default     = 8
+}
+
 variable "ssh_key_name" {
   description = "ssh key name installed in the Terraformer instance."
   type        = string
