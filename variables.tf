@@ -89,6 +89,12 @@ variable "root_volume_size" {
   default     = 8
 }
 
+variable "smtp_credentials_secret" {
+  description = "AWS secret name with SMTP credentials. The secret must contain a JSON with user and password keys."
+  type        = string
+  default     = null
+}
+
 variable "ssh_key_name" {
   description = "ssh key name installed in the Terraformer instance."
   type        = string

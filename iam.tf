@@ -5,7 +5,7 @@ resource "random_string" "profile-suffix" {
 
 data "aws_iam_policy_document" "permissions" {
   statement {
-    actions   = [
+    actions = [
       "sts:AssumeRole",
       "iam:GetRole"
     ]
