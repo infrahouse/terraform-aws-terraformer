@@ -39,7 +39,7 @@ module "terraformer" {
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_profile"></a> [profile](#module\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | ~> 1.3 |
-| <a name="module_userdata"></a> [userdata](#module\_userdata) | registry.infrahouse.com/infrahouse/cloud-init/aws | ~> 1.6 |
+| <a name="module_userdata"></a> [userdata](#module\_userdata) | registry.infrahouse.com/infrahouse/cloud-init/aws | 1.12.4 |
 
 ## Resources
 
@@ -80,6 +80,7 @@ module "terraformer" {
 | <a name="input_puppet_module_path"></a> [puppet\_module\_path](#input\_puppet\_module\_path) | Path to common puppet modules. | `string` | `"{root_directory}/modules"` | no |
 | <a name="input_puppet_root_directory"></a> [puppet\_root\_directory](#input\_puppet\_root\_directory) | Path where the puppet code is hosted. | `string` | `"/opt/puppet-code"` | no |
 | <a name="input_root_volume_size"></a> [root\_volume\_size](#input\_root\_volume\_size) | Disk size in GB mounted as the root volume | `number` | `8` | no |
+| <a name="input_smtp_credentials_secret"></a> [smtp\_credentials\_secret](#input\_smtp\_credentials\_secret) | AWS secret name with SMTP credentials. The secret must contain a JSON with user and password keys. | `string` | `null` | no |
 | <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | ssh key name installed in the Terraformer instance. | `string` | n/a | yes |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet id where the Terraformer instance will be created. | `string` | n/a | yes |
 | <a name="input_ubuntu_codename"></a> [ubuntu\_codename](#input\_ubuntu\_codename) | Ubuntu version to use for the Terraformer instance | `string` | `"jammy"` | no |

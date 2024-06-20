@@ -1,6 +1,6 @@
 module "userdata" {
   source      = "registry.infrahouse.com/infrahouse/cloud-init/aws"
-  version     = "~> 1.6"
+  version     = "1.12.4"
   environment = var.environment
   role        = "terraformer"
   packages = concat(
@@ -27,6 +27,12 @@ module "userdata" {
   puppet_manifest          = var.puppet_manifest
   puppet_module_path       = var.puppet_module_path
   puppet_root_directory    = var.puppet_root_directory
+  custom_facts = var.smtp_credentials_secret != null ? {
+    postfix : {
+      smtp_credentials : var.smtp_credentials_secret
+    }
+  } : {}
+
 }
 
 resource "aws_instance" "terraformer" {
