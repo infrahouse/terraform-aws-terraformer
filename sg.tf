@@ -2,9 +2,12 @@ resource "aws_security_group" "terraformer" {
   description = "Access to Terraformer"
   name_prefix = "terraformer-"
   vpc_id      = data.aws_vpc.selected.id
-  tags = {
-    Name : "terraformer"
-  }
+  tags = merge(
+    {
+      Name : "terraformer"
+    },
+    local.tags
+  )
 }
 
 resource "aws_vpc_security_group_ingress_rule" "terraformer_ssh" {
