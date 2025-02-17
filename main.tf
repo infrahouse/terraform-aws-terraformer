@@ -54,6 +54,10 @@ resource "aws_instance" "terraformer" {
     },
     local.tags
   )
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
   lifecycle {
     replace_triggered_by = [
       null_resource.terraformer.id
