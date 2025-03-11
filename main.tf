@@ -1,8 +1,9 @@
 module "userdata" {
-  source      = "registry.infrahouse.com/infrahouse/cloud-init/aws"
-  version     = "1.12.4"
-  environment = var.environment
-  role        = "terraformer"
+  source          = "registry.infrahouse.com/infrahouse/cloud-init/aws"
+  version         = "1.17.0"
+  environment     = var.environment
+  ubuntu_codename = var.ubuntu_codename
+  role            = "terraformer"
   packages = concat(
     [
       "make",

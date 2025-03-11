@@ -22,7 +22,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-${var.ubuntu_codename}-${local.ubuntu_versions[var.ubuntu_codename]}-*"]
+    values = [local.ami_name_pattern]
   }
 
   filter {
@@ -33,6 +33,13 @@ data "aws_ami" "ubuntu" {
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+
+  filter {
+    name = "state"
+    values = [
+      "available"
+    ]
   }
 
   owners = ["099720109477"] # Canonical
