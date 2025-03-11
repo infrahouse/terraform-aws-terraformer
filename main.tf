@@ -4,6 +4,7 @@ module "userdata" {
   environment     = var.environment
   ubuntu_codename = var.ubuntu_codename
   role            = "terraformer"
+  gzip_userdata   = true
   packages = concat(
     [
       "make",
