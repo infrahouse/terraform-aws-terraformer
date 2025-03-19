@@ -38,7 +38,7 @@ module "userdata" {
 }
 
 resource "aws_instance" "terraformer" {
-  ami              = var.ami == null ? data.aws_ami.ubuntu.id : var.ami
+  ami              = var.ami == null ? data.aws_ami.ubuntu_pro.id : var.ami
   instance_type    = var.instance_type
   subnet_id        = var.subnet
   key_name         = var.ssh_key_name

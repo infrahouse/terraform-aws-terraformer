@@ -17,12 +17,12 @@ data "aws_vpc" "selected" {
   id = data.aws_subnet.selected.vpc_id
 }
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu_pro" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = [local.ami_name_pattern]
+    values = [local.ami_name_pattern_pro]
   }
 
   filter {
