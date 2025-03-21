@@ -115,3 +115,9 @@ variable "zone_id" {
   description = "Zone where the DNS record will be created."
   type        = string
 }
+
+variable "sns_topic_alarm_arn" {
+  description = "ARN of SNS topic for Cloudwatch alarms on base EC2 instance."
+  type        = string
+  default     = null
+}
