@@ -4,6 +4,7 @@ resource "random_string" "profile-suffix" {
 }
 
 data "aws_iam_policy_document" "permissions" {
+  source_policy_documents = var.extra_instance_profile_permissions != null ? [var.extra_instance_profile_permissions] : []
   statement {
     actions = [
       "sts:AssumeRole",
