@@ -28,7 +28,7 @@ that the Terraformer needs to assume.
 ```hcl
 module "terraformer" {
   source  = "registry.infrahouse.com/infrahouse/terraformer/aws"
-  version = "0.18.0"
+  version = "0.19.0"
 
   ssh_key_name = aws_key_pair.test.key_name
   zone_id      = data.aws_route53_zone.test_zone.zone_id
