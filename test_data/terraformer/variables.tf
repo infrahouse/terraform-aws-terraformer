@@ -2,7 +2,9 @@ variable "environment" {
   default = "development"
 }
 variable "region" {}
-variable "role_arn" {}
+variable "role_arn" {
+  default = null
+}
 variable "zone_name" {}
 
 

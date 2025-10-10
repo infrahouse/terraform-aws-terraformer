@@ -1,6 +1,6 @@
 module "userdata" {
   source          = "registry.infrahouse.com/infrahouse/cloud-init/aws"
-  version         = "1.18.0"
+  version         = "2.2.2"
   environment     = var.environment
   ubuntu_codename = var.ubuntu_codename
   role            = "terraformer"

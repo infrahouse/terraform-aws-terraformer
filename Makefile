@@ -11,6 +11,9 @@ for line in sys.stdin:
 endef
 export PRINT_HELP_PYSCRIPT
 
+TEST_REGION="us-west-2"
+TEST_ROLE="arn:aws:iam::303467602807:role/terraformer-tester"
+
 help: install-hooks
 	@python -c "$$PRINT_HELP_PYSCRIPT" < Makefile
 
@@ -24,21 +27,42 @@ install-hooks:  ## Install repo hooks
 
 .PHONY: test
 test:  ## Run tests on the module
-	rm -f test_data/test_module/.terraform.lock.hcl
-	#rm -rf test_data/test_module/.terraform
 	pytest -xvvs tests/
+
+.PHONY: test-keep
+test-keep:  ## Run a test and keep resources
+	pytest -xvvs \
+		--aws-region=${TEST_REGION} \
+		--test-role-arn=${TEST_ROLE} \
+		--keep-after \
+		-k aws-6 \
+		tests/test_module.py
+
+.PHONY: test-clean
+test-clean:  ## Run a test and destroy resources
+	pytest -xvvs \
+		--aws-region=${TEST_REGION} \
+		--test-role-arn=${TEST_ROLE} \
+		-k aws-6 \
+		tests/test_module.py
 
 
 .PHONY: bootstrap
-bootstrap: ## bootstrap the development environment
-	pip install -U "pip ~= 23.1"
-	pip install -U "setuptools ~= 68.0"
+bootstrap: install-hooks ## bootstrap the development environment
+	pip install -U "pip ~= 25.2"
+	pip install -U "setuptools ~= 80.9"
 	pip install -r requirements.txt
 
 .PHONY: clean
 clean: ## clean the repo from cruft
 	rm -rf .pytest_cache
 	find . -name '.terraform' -exec rm -fr {} +
+
+.PHONY: lint
+lint:  ## Check code formatting without modifying files
+	@echo "Checking terraform file formatting"
+	terraform fmt -recursive -check
+	black --check tests
 
 .PHONY: fmt
 fmt: format
