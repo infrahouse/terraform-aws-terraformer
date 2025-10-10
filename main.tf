@@ -53,7 +53,8 @@ resource "aws_instance" "terraformer" {
   tags = merge(
     {
       Name : "terraformer"
-      InspectorEc2Exclusion : "true"
+      InspectorEc2Exclusion : "true",
+      module_version : local.module_version
     },
     local.tags
   )

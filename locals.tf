@@ -1,4 +1,6 @@
 locals {
+  module_version = "0.18.0"
+
   tags = {
     environment : var.environment
     service : "terraformer"
