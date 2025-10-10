@@ -5,7 +5,8 @@ provider "aws" {
     content {
       role_arn = var.role_arn
     }
-  }  default_tags {
+  }
+  default_tags {
     tags = {
       "created_by" : "infrahouse/terraform-aws-terraformer" # GitHub repository that created a resource
     }

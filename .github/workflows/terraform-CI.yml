@@ -54,7 +54,7 @@ jobs:
         run: make bootstrap
 
       - name: Code Style Check
-        run: make format
+        run: make lint
 
       - name: Terraform Tests
         run: make test

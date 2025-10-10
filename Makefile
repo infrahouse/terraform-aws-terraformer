@@ -48,7 +48,7 @@ test-clean:  ## Run a test and destroy resources
 
 
 .PHONY: bootstrap
-bootstrap: ## bootstrap the development environment
+bootstrap: install-hooks ## bootstrap the development environment
 	pip install -U "pip ~= 25.2"
 	pip install -U "setuptools ~= 80.9"
 	pip install -r requirements.txt
@@ -57,6 +57,12 @@ bootstrap: ## bootstrap the development environment
 clean: ## clean the repo from cruft
 	rm -rf .pytest_cache
 	find . -name '.terraform' -exec rm -fr {} +
+
+.PHONY: lint
+lint:  ## Check code formatting without modifying files
+	@echo "Checking terraform file formatting"
+	terraform fmt -recursive -check
+	black --check tests
 
 .PHONY: fmt
 fmt: format
