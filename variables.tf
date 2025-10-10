@@ -18,20 +18,31 @@ variable "environment" {
 
 variable "extra_files" {
   description = "Additional files to create on an instance."
-  type = list(object({
-    content     = string
-    path        = string
-    permissions = string
-  }))
+  type = list(
+    object(
+      {
+        content     = string
+        path        = string
+        permissions = string
+      }
+    )
+  )
   default = []
 }
 
 variable "extra_repos" {
   description = "Additional APT repositories to configure on an instance."
-  type = map(object({
-    source = string
-    key    = string
-  }))
+  type = map(
+    object(
+      {
+        source   = string
+        key      = string
+        machine  = optional(string)
+        authFrom = optional(string)
+        priority = optional(number)
+      }
+    )
+  )
   default = {}
 }
 
@@ -42,7 +53,7 @@ variable "instance_type" {
 }
 
 variable "packages" {
-  description = "List of packages to install when the instances bootstraps."
+  description = "List of packages to install when the instance bootstraps."
   type        = list(string)
   default     = []
 }
@@ -108,7 +119,7 @@ variable "subnet" {
 variable "ubuntu_codename" {
   description = "Ubuntu version to use for the Terraformer instance"
   type        = string
-  default     = "jammy"
+  default     = "noble"
 }
 
 variable "zone_id" {
@@ -123,7 +134,7 @@ variable "sns_topic_alarm_arn" {
 }
 
 variable "extra_instance_profile_permissions" {
-  description = "A JSON with a permissions policy document. The policy will be attached to the ASG instance profile."
+  description = "A JSON with a permissions policy document. The policy will be attached to the instance profile."
   type        = string
   default     = null
 }
