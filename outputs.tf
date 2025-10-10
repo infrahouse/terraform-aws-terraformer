@@ -12,3 +12,8 @@ output "instance_id" {
   description = "Instance id of terraformer ec2."
   value       = aws_instance.terraformer.id
 }
+
+output "hostname" {
+  description = "Fully qualified domain name of the Terraformer instance."
+  value       = aws_route53_record.terraformer.fqdn
+}
