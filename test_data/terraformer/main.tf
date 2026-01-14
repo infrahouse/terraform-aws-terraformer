@@ -4,4 +4,5 @@ module "terraformer" {
   subnet           = var.subnet_private_ids[0]
   root_volume_size = 30
   environment      = "development"
+  alarm_emails     = ["test@example.com"]
 }

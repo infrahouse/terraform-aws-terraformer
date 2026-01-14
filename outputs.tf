@@ -32,3 +32,8 @@ output "cloudwatch_log_group_name" {
   description = "CloudWatch log group name for terraformer logs"
   value       = aws_cloudwatch_log_group.terraformer.name
 }
+
+output "sns_topic_arn" {
+  description = "ARN of SNS topic for alarm notifications"
+  value       = aws_sns_topic.terraformer_alarms.arn
+}

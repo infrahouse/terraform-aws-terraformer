@@ -159,10 +159,19 @@ variable "zone_id" {
   type        = string
 }
 
-variable "sns_topic_alarm_arn" {
-  description = "ARN of SNS topic for Cloudwatch alarms on base EC2 instance."
-  type        = string
-  default     = null
+variable "alarm_emails" {
+  description = "List of email addresses to receive CloudWatch alarm notifications. AWS SNS will send a confirmation email to each address - recipients MUST click the confirmation link to activate notifications."
+  type        = list(string)
+
+  validation {
+    condition     = length(var.alarm_emails) >= 1
+    error_message = "At least one email address is required for alarm notifications. Provided: ${length(var.alarm_emails)}"
+  }
+
+  validation {
+    condition     = alltrue([for email in var.alarm_emails : can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email))])
+    error_message = "All alarm_emails must be valid email addresses (e.g., user@example.com)."
+  }
 }
 
 variable "extra_instance_profile_permissions" {
@@ -172,9 +181,9 @@ variable "extra_instance_profile_permissions" {
 }
 
 variable "cloudwatch_namespace" {
-  description = "CloudWatch namespace for custom metrics"
+  description = "CloudWatch namespace for custom metrics (convention: Service/Component)"
   type        = string
-  default     = "terraformer"
+  default     = "Terraformer/System"
 }
 
 variable "cloudwatch_log_retention" {
