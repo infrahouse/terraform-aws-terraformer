@@ -8,12 +8,21 @@ variable "dns_name" {
   description = "Hostname of the Terraformer in zone var.zone_id."
   type        = string
   default     = "terraformer"
+
+  validation {
+    condition     = can(regex("^[a-z0-9]([a-z0-9-]*[a-z0-9])?$", var.dns_name))
+    error_message = "dns_name must be a valid DNS label (lowercase letters, numbers, and hyphens)"
+  }
 }
 
 variable "environment" {
   description = "Puppet environment."
   type        = string
-  default     = "development"
+
+  validation {
+    condition     = can(regex("^[a-z0-9_]+$", var.environment))
+    error_message = "environment must contain only lowercase letters, numbers, and underscores (no hyphens)"
+  }
 }
 
 variable "extra_files" {
@@ -98,6 +107,11 @@ variable "root_volume_size" {
   description = "Disk size in GB mounted as the root volume"
   type        = number
   default     = 8
+
+  validation {
+    condition     = var.root_volume_size >= 8
+    error_message = "root_volume_size must be at least 8 GB for Ubuntu"
+  }
 }
 
 variable "smtp_credentials_secret" {
@@ -107,8 +121,26 @@ variable "smtp_credentials_secret" {
 }
 
 variable "ssh_key_name" {
-  description = "ssh key name installed in the Terraformer instance."
+  description = "SSH key name installed in the Terraformer instance. If not provided, a key pair will be auto-generated and rotated."
   type        = string
+  default     = null
+}
+
+variable "ssh_key_rotation_days" {
+  description = "Number of days before SSH key rotation when auto-generated"
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = var.ssh_key_rotation_days > 0
+    error_message = "ssh_key_rotation_days must be greater than 0"
+  }
+}
+
+variable "ssh_key_readers" {
+  description = "List of IAM role/user ARNs allowed to read the auto-generated SSH private key from Secrets Manager"
+  type        = list(string)
+  default     = null
 }
 
 variable "subnet" {
@@ -137,4 +169,27 @@ variable "extra_instance_profile_permissions" {
   description = "A JSON with a permissions policy document. The policy will be attached to the instance profile."
   type        = string
   default     = null
+}
+
+variable "cloudwatch_namespace" {
+  description = "CloudWatch namespace for custom metrics"
+  type        = string
+  default     = "terraformer"
+}
+
+variable "cloudwatch_log_retention" {
+  description = "CloudWatch log group retention in days"
+  type        = number
+  default     = 365
+
+  validation {
+    condition     = contains([1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653], var.cloudwatch_log_retention)
+    error_message = "cloudwatch_log_retention must be a valid CloudWatch Logs retention period"
+  }
+}
+
+variable "puppet_custom_facts" {
+  description = "Custom facts for Puppet (will be merged with terraformer-specific facts)"
+  type        = map(any)
+  default     = {}
 }

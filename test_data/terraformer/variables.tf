@@ -5,7 +5,7 @@ variable "region" {}
 variable "role_arn" {
   default = null
 }
-variable "zone_name" {}
+variable "test_zone_id" {}
 
 
 variable "subnet_public_ids" {}

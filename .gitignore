@@ -35,3 +35,6 @@ tf.plan
 /plan.stderr
 /plan.stdout
 __pycache__
+
+.claude/reviews/
+.claude/settings.local.json

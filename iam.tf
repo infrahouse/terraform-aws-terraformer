@@ -12,6 +12,28 @@ data "aws_iam_policy_document" "permissions" {
     ]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.terraformer.arn}:*"
+    ]
+  }
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "cloudwatch:namespace"
+      values   = [var.cloudwatch_namespace]
+    }
+  }
 }
 
 module "profile" {
