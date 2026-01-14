@@ -14,7 +14,10 @@ resource "aws_cloudwatch_metric_alarm" "terraformer_system_auto_recovery" {
     InstanceId = aws_instance.terraformer.id
   }
 
-  alarm_actions = ["arn:aws:automate:${data.aws_region.current.name}:ec2:recover"]
+  alarm_actions = [
+    "arn:aws:automate:${data.aws_region.current.name}:ec2:recover",
+    aws_sns_topic.terraformer_alarms.arn
+  ]
 
   tags = merge(
     {
@@ -40,10 +43,10 @@ resource "aws_cloudwatch_metric_alarm" "terraformer_instance_check" {
     InstanceId = aws_instance.terraformer.id
   }
 
-  alarm_actions = concat(
-    ["arn:aws:automate:${data.aws_region.current.name}:ec2:reboot"],
-    var.sns_topic_alarm_arn != null ? [var.sns_topic_alarm_arn] : []
-  )
+  alarm_actions = [
+    "arn:aws:automate:${data.aws_region.current.name}:ec2:reboot",
+    aws_sns_topic.terraformer_alarms.arn
+  ]
 
   tags = merge(
     {
