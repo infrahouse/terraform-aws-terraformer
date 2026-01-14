@@ -29,11 +29,26 @@ module "userdata" {
   puppet_manifest          = var.puppet_manifest
   puppet_module_path       = var.puppet_module_path
   puppet_root_directory    = var.puppet_root_directory
-  custom_facts = var.smtp_credentials_secret != null ? {
-    postfix : {
-      smtp_credentials : var.smtp_credentials_secret
-    }
-  } : {}
+  custom_facts = merge(
+    var.puppet_custom_facts,
+    {
+      terraformer = merge(
+        {
+          cloudwatch_log_group = aws_cloudwatch_log_group.terraformer.name
+          cloudwatch_namespace = var.cloudwatch_namespace
+        },
+        lookup(var.puppet_custom_facts, "terraformer", {})
+      )
+    },
+    var.smtp_credentials_secret != null ? {
+      postfix = {
+        smtp_credentials = var.smtp_credentials_secret
+      }
+    } : {}
+  )
+  post_runcmd = [
+    "touch /var/run/puppet-done"
+  ]
 
 }
 
@@ -41,7 +56,7 @@ resource "aws_instance" "terraformer" {
   ami              = var.ami == null ? data.aws_ami.ubuntu_pro.id : var.ami
   instance_type    = var.instance_type
   subnet_id        = var.subnet
-  key_name         = var.ssh_key_name
+  key_name         = var.ssh_key_name != null ? var.ssh_key_name : aws_key_pair.terraformer[0].key_name
   user_data_base64 = module.userdata.userdata
   vpc_security_group_ids = [
     aws_security_group.terraformer.id
