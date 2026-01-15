@@ -283,8 +283,8 @@ aws cloudwatch enable-alarm-actions \
 
 **SSH (port 22):**
 
-- Source: VPC CIDR only
-- No public internet access
+- Source: VPC CIDR (always allowed)
+- Additional CIDRs via `extra_ssh_cidrs` variable
 
 **ICMP (all types):**
 
@@ -295,21 +295,36 @@ aws cloudwatch enable-alarm-actions \
 
 - All traffic allowed (required for AWS API, Puppet, package updates)
 
-### VPC Best Practices
+### Subnet Options
 
-1. **Private Subnet Only**
-   ```hcl
-   module "terraformer" {
-     # ...
-     subnet = data.aws_subnet.private.id  # Must have NAT gateway
-   }
-   ```
+**Private Subnet (Recommended for Production):**
 
-2. **No Public IP**
-   - Instance does not get public IP
-   - Access via bastion host or VPN only
+```hcl
+module "terraformer" {
+  # ...
+  subnet = data.aws_subnet.private.id  # Must have NAT gateway
+}
+```
 
-3. **VPC Endpoints (Recommended)**
+- Instance gets private IP only
+- DNS record points to private IP
+- Access via bastion host, VPN, or AWS SSM Session Manager
+
+**Public Subnet (For Development/Testing):**
+
+```hcl
+module "terraformer" {
+  # ...
+  subnet          = data.aws_subnet.public.id
+  extra_ssh_cidrs = ["203.0.113.0/24"]  # Your office/home IP
+}
+```
+
+- Instance gets public IP (if subnet has `map_public_ip_on_launch = true`)
+- DNS record automatically uses public IP
+- Direct SSH access from allowed CIDRs
+
+### VPC Endpoints (Recommended)
    ```hcl
    # Add VPC endpoints for AWS services
    resource "aws_vpc_endpoint" "s3" {
@@ -400,8 +415,8 @@ module "terraformer" {
 
 ## Security Checklist
 
-- [ ] Instance in private subnet with NAT gateway
-- [ ] SSH access restricted to VPC CIDR
+- [ ] Instance in private subnet with NAT gateway (production) or public subnet with restricted `extra_ssh_cidrs` (development)
+- [ ] SSH access restricted to VPC CIDR and explicitly allowed CIDRs only
 - [ ] Auto-generated SSH keys with rotation enabled
 - [ ] `ssh_key_readers` configured for key access control
 - [ ] Extra IAM permissions follow least privilege

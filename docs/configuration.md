@@ -118,6 +118,28 @@ ubuntu_codename = "jammy"  # Ubuntu 22.04 LTS
 dns_name = "tf-admin"
 ```
 
+### `extra_ssh_cidrs`
+
+**Type:** `list(string)`
+**Default:** `[]`
+
+**Description:** Additional CIDR blocks to allow SSH access from, beyond the VPC CIDR. Useful for accessing from workstations or other networks.
+
+**Validation:** All values must be valid IPv4 CIDR blocks.
+
+```hcl
+extra_ssh_cidrs = [
+  "203.0.113.0/24",    # Office network
+  "198.51.100.50/32"   # VPN exit IP
+]
+```
+
+!!! note "VPC Access Always Included"
+    SSH access from the VPC CIDR is always allowed. Do not include the VPC CIDR in `extra_ssh_cidrs` - the module will fail with a duplicate error.
+
+!!! tip "Public Subnet + Public IP"
+    When using a public subnet (one with `map_public_ip_on_launch = true`), the DNS record will automatically use the public IP, making the instance accessible via `extra_ssh_cidrs`.
+
 ## SSH Key Configuration
 
 ### `ssh_key_name`
@@ -284,9 +306,9 @@ puppet_custom_facts = {
 ### `puppet_module_path`
 
 **Type:** `string`
-**Default:** `"{root_directory}/modules"`
+**Default:** `"{root_directory}/environments/{environment}/modules:{root_directory}/modules"`
 
-**Description:** Puppet module path configuration.
+**Description:** Colon-separated list of Puppet module paths, searched in order. The default searches environment-specific modules first, then falls back to global modules.
 
 ### `puppet_root_directory`
 
