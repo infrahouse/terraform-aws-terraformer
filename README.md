@@ -56,6 +56,8 @@ module "terraformer" {
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.11, < 7.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.5.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.0 |
+| <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 4.0.0 |
 
 ## Providers
 
@@ -64,8 +66,8 @@ module "terraformer" {
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.11, < 7.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.2.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.5.0 |
-| <a name="provider_time"></a> [time](#provider\_time) | n/a |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
+| <a name="provider_time"></a> [time](#provider\_time) | >= 0.9.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | >= 4.0.0 |
 
 ## Modules
 
