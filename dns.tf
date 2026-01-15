@@ -4,6 +4,6 @@ resource "aws_route53_record" "terraformer" {
   zone_id = data.aws_route53_zone.zone.zone_id
   ttl     = 300
   records = [
-    aws_instance.terraformer.private_ip
+    data.aws_subnet.selected.map_public_ip_on_launch ? aws_instance.terraformer.public_ip : aws_instance.terraformer.private_ip
   ]
 }

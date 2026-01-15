@@ -92,9 +92,9 @@ variable "puppet_manifest" {
 }
 
 variable "puppet_module_path" {
-  description = "Path to common puppet modules."
+  description = "Path to puppet modules. Colon-separated list searched in order."
   type        = string
-  default     = "{root_directory}/modules"
+  default     = "{root_directory}/environments/{environment}/modules:{root_directory}/modules"
 }
 
 variable "puppet_root_directory" {
@@ -146,6 +146,17 @@ variable "ssh_key_readers" {
 variable "subnet" {
   description = "Subnet id where the Terraformer instance will be created."
   type        = string
+}
+
+variable "extra_ssh_cidrs" {
+  description = "Additional CIDR blocks to allow SSH access from (in addition to VPC CIDR). Useful for accessing from workstations or other networks. Note: Do not include CIDRs that overlap with the VPC CIDR as those are already allowed."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for cidr in var.extra_ssh_cidrs : can(cidrhost(cidr, 0))])
+    error_message = "All extra_ssh_cidrs must be valid IPv4 CIDR blocks (e.g., 10.0.0.0/8, 192.168.1.0/24)."
+  }
 }
 
 variable "ubuntu_codename" {
