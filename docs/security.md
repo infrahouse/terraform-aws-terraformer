@@ -112,7 +112,7 @@ The instance profile includes minimal base permissions:
     "logs:DescribeLogGroups",
     "logs:DescribeLogStreams"
   ],
-  "Resource": "arn:aws:logs:*:*:log-group:/aws/ec2/terraformer:*"
+   "Resource": "arn:aws:logs:*:*:log-group:/aws/ec2/terraformer/${environment}/${dns_name}:*"
 }
 ```
 
@@ -362,7 +362,7 @@ metadata_options {
 
 All operations on the instance are logged:
 
-- **Log Group:** `/aws/ec2/terraformer`
+- **Log Group:** `/aws/ec2/terraformer/${environment}/${dns_name}`
 - **Retention:** 365 days (ISO 27001 compliant)
 - **Streams:** Organized by instance ID and log type
 
