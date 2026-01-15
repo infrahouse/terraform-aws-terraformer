@@ -3,8 +3,11 @@
 [![Registry](https://img.shields.io/badge/Terraform-Registry-purple?logo=terraform)](https://registry.terraform.io/modules/infrahouse/terraformer/aws/latest)
 [![Release](https://img.shields.io/github/release/infrahouse/terraform-aws-terraformer.svg)](https://github.com/infrahouse/terraform-aws-terraformer/releases/latest)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-github.io-blue)](https://infrahouse.github.io/terraform-aws-terraformer/)
+[![Security](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/vuln-scanner-pr.yml/badge.svg)](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/vuln-scanner-pr.yml)
 [![CD](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/terraform-CD.yml/badge.svg)](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/terraform-CD.yml)
 [![AWS EC2](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonec2)](https://aws.amazon.com/ec2/)
+[![Need Help?](https://img.shields.io/badge/Need%20Help%3F-Contact%20Us-0066CC)](https://infrahouse.com/contact)
 
 A Terraform module that provisions a dedicated EC2 instance for administrative Terraform operations in AWS.
 
@@ -154,3 +157,32 @@ module "terraformer" {
 | <a name="output_sns_topic_arn"></a> [sns\_topic\_arn](#output\_sns\_topic\_arn) | ARN of SNS topic for alarm notifications |
 | <a name="output_ssh_key_secret_arn"></a> [ssh\_key\_secret\_arn](#output\_ssh\_key\_secret\_arn) | ARN of Secrets Manager secret containing auto-generated SSH private key (if applicable) |
 <!-- END_TF_DOCS -->
+
+## Documentation
+
+For detailed documentation, visit the [GitHub Pages site](https://infrahouse.github.io/terraform-aws-terraformer/).
+
+- [Getting Started](https://infrahouse.github.io/terraform-aws-terraformer/getting-started/)
+- [Configuration](https://infrahouse.github.io/terraform-aws-terraformer/configuration/)
+- [Architecture](https://infrahouse.github.io/terraform-aws-terraformer/architecture/)
+- [Security](https://infrahouse.github.io/terraform-aws-terraformer/security/)
+- [Troubleshooting](https://infrahouse.github.io/terraform-aws-terraformer/troubleshooting/)
+
+## Examples
+
+See the [test_data/terraformer](test_data/terraformer/) directory for a working example configuration.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Run tests with `make test-clean`
+4. Commit your changes
+5. Push to the branch
+6. Open a Pull Request
+
+## License
+
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
