@@ -1,13 +1,12 @@
 # terraform-aws-terraformer
 
+[![Need Help?](https://img.shields.io/badge/Need%20Help%3F-Contact%20Us-0066CC)](https://infrahouse.com/contact)
+[![Docs](https://img.shields.io/badge/docs-github.io-blue)](https://infrahouse.github.io/terraform-aws-terraformer/)
 [![Registry](https://img.shields.io/badge/Terraform-Registry-purple?logo=terraform)](https://registry.terraform.io/modules/infrahouse/terraformer/aws/latest)
 [![Release](https://img.shields.io/github/release/infrahouse/terraform-aws-terraformer.svg)](https://github.com/infrahouse/terraform-aws-terraformer/releases/latest)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-github.io-blue)](https://infrahouse.github.io/terraform-aws-terraformer/)
-[![Security](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/vuln-scanner-pr.yml/badge.svg)](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/vuln-scanner-pr.yml)
-[![CD](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/terraform-CD.yml/badge.svg)](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/terraform-CD.yml)
 [![AWS EC2](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonec2)](https://aws.amazon.com/ec2/)
-[![Need Help?](https://img.shields.io/badge/Need%20Help%3F-Contact%20Us-0066CC)](https://infrahouse.com/contact)
+[![Security](https://img.shields.io/github/actions/workflow/status/infrahouse/terraform-aws-terraformer/vuln-scanner-pr.yml?label=Security)](https://github.com/infrahouse/terraform-aws-terraformer/actions/workflows/vuln-scanner-pr.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 A Terraform module that provisions a dedicated EC2 instance for administrative Terraform operations in AWS.
 
