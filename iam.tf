@@ -34,6 +34,10 @@ data "aws_iam_policy_document" "permissions" {
       values   = [var.cloudwatch_namespace]
     }
   }
+  statement {
+    actions   = ["ec2:DescribeTags"]
+    resources = ["*"]
+  }
 }
 
 module "profile" {

@@ -135,6 +135,18 @@ The instance profile includes minimal base permissions:
 
 **Why:** Publish custom metrics. Restricted to terraformer namespace only.
 
+#### EC2 Tags
+
+```json
+{
+  "Effect": "Allow",
+  "Action": "ec2:DescribeTags",
+  "Resource": "*"
+}
+```
+
+**Why:** Required for CloudWatch agent's ec2tagger to enrich metrics with instance tags.
+
 ### Adding Permissions
 
 For additional operations (e.g., S3 state access):

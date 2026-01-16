@@ -14,6 +14,44 @@ from tests.conftest import (
 )
 
 
+def wait_for_puppet_completion(instance, max_wait=600, poll_interval=10):
+    """
+    Wait for Puppet to complete bootstrap on the instance.
+
+    Args:
+        instance: EC2Instance object
+        max_wait: Maximum time to wait in seconds (default: 600 = 10 minutes)
+        poll_interval: Time between checks in seconds (default: 10)
+
+    Raises:
+        AssertionError if Puppet doesn't complete within max_wait
+    """
+    LOG.info(
+        f"Waiting for Puppet to complete bootstrap (up to {max_wait // 60} minutes)..."
+    )
+
+    for attempt in range(max_wait // poll_interval):
+        exit_code, stdout, stderr = instance.execute_command(
+            "test -f /var/run/puppet-done && echo 'done' || echo 'not done'"
+        )
+
+        if exit_code == 0 and stdout.strip() == "done":
+            LOG.info(
+                f"✓ Puppet bootstrap completed (after {(attempt + 1) * poll_interval} seconds)"
+            )
+            return
+
+        LOG.info(
+            f"   Puppet still running (attempt {attempt + 1}/{max_wait // poll_interval})..."
+        )
+        time.sleep(poll_interval)
+
+    assert False, (
+        f"Puppet bootstrap did not complete after {max_wait} seconds. "
+        f"Marker file /var/run/puppet-done not found."
+    )
+
+
 def verify_cloudwatch_integration(
     instance, boto3_session, aws_region, cloudwatch_namespace, log_group_name
 ):
@@ -28,36 +66,8 @@ def verify_cloudwatch_integration(
     """
     LOG.info("Testing CloudWatch integration (Logs + Metrics)...")
 
-    # 1. Wait for Puppet to complete (marked by /var/run/puppet-done)
-    LOG.info("1. Waiting for Puppet to complete bootstrap (up to 10 minutes)...")
-    max_wait = 600  # 10 minutes
-    poll_interval = 10
-    puppet_done = False
-
-    for attempt in range(max_wait // poll_interval):
-        exit_code, stdout, stderr = instance.execute_command(
-            "test -f /var/run/puppet-done && echo 'done' || echo 'not done'"
-        )
-
-        if exit_code == 0 and stdout.strip() == "done":
-            puppet_done = True
-            LOG.info(
-                f"✓ Puppet bootstrap completed (after {(attempt + 1) * poll_interval} seconds)"
-            )
-            break
-
-        LOG.info(
-            f"   Puppet still running (attempt {attempt + 1}/{max_wait // poll_interval})..."
-        )
-        time.sleep(poll_interval)
-
-    assert puppet_done, (
-        f"Puppet bootstrap did not complete after {max_wait} seconds. "
-        f"Marker file /var/run/puppet-done not found."
-    )
-
-    # 2. Verify CloudWatch Log Group exists in AWS
-    LOG.info("2. Verifying CloudWatch Log Group exists in AWS...")
+    # 1. Verify CloudWatch Log Group exists in AWS
+    LOG.info("1. Verifying CloudWatch Log Group exists in AWS...")
     logs_client = boto3_session.client("logs", region_name=aws_region)
 
     try:
@@ -82,8 +92,8 @@ def verify_cloudwatch_integration(
     except Exception as e:
         pytest.fail(f"Failed to verify CloudWatch Log Group: {e}")
 
-    # 3. Verify end-to-end logging using AWS CLI from instance
-    LOG.info("3. Verifying end-to-end CloudWatch Logs integration...")
+    # 2. Verify end-to-end logging using AWS CLI from instance
+    LOG.info("2. Verifying end-to-end CloudWatch Logs integration...")
 
     # Generate unique test message and log stream
     test_message = f"TERRAFORMER_TEST_LOG_{uuid.uuid4().hex}"
@@ -149,8 +159,8 @@ def verify_cloudwatch_integration(
 
     LOG.info("✓ End-to-end CloudWatch Logs integration verified")
 
-    # 5. Verify end-to-end metrics integration
-    LOG.info("5. Verifying end-to-end CloudWatch Metrics integration...")
+    # 3. Verify end-to-end metrics integration
+    LOG.info("3. Verifying end-to-end CloudWatch Metrics integration...")
 
     # Generate unique metric name
     test_metric_name = f"TestMetric_{uuid.uuid4().hex[:8]}"
@@ -201,6 +211,30 @@ def verify_cloudwatch_integration(
 
     LOG.info("✓ End-to-end CloudWatch Metrics integration verified")
     LOG.info("✅ All CloudWatch integration tests passed!")
+
+
+def verify_ec2_describe_tags(instance, aws_region):
+    """
+    Verify the instance has ec2:DescribeTags permission.
+
+    This is required for CloudWatch agent's ec2tagger to work properly.
+    """
+    LOG.info("Testing ec2:DescribeTags permission...")
+
+    exit_code, stdout, stderr = instance.execute_command(
+        f"aws ec2 describe-tags --region {aws_region} --max-items 1"
+    )
+
+    if exit_code != 0:
+        LOG.error(f"ec2:DescribeTags failed. stderr: {stderr}")
+
+    assert exit_code == 0, (
+        f"ec2:DescribeTags permission missing. "
+        f"CloudWatch agent ec2tagger requires this permission. "
+        f"stderr: {stderr}"
+    )
+
+    LOG.info("✓ ec2:DescribeTags permission verified")
 
 
 @pytest.mark.parametrize(
@@ -293,6 +327,9 @@ def test_module(
         # Create EC2Instance object for the terraformer instance
         instance = EC2Instance(instance_id, region=aws_region, role_arn=test_role_arn)
 
+        # Wait for Puppet to complete before running verifications
+        wait_for_puppet_completion(instance)
+
         # Verify CloudWatch integration
         verify_cloudwatch_integration(
             instance=instance,
@@ -301,3 +338,5 @@ def test_module(
             cloudwatch_namespace=cloudwatch_namespace,
             log_group_name=log_group_name,
         )
+        # Verify ec2:DescribeTags permission (required for CloudWatch agent ec2tagger)
+        verify_ec2_describe_tags(instance=instance, aws_region=aws_region)
