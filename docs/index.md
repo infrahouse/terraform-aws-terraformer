@@ -38,7 +38,7 @@ This Terraform module creates a dedicated EC2 instance ("Terraformer") for admin
 ```hcl
 module "terraformer" {
   source  = "registry.infrahouse.com/infrahouse/terraformer/aws"
-  version = "1.0.0"
+  version = "1.0.1"
 
   # Required
   environment  = "production"
