@@ -55,6 +55,12 @@ variable "extra_repos" {
   default = {}
 }
 
+variable "inspector_ec2_exclusion" {
+  description = "When true, tag the instance with InspectorEc2Exclusion=true to exclude it from AWS Inspector EC2 scanning."
+  type        = bool
+  default     = false
+}
+
 variable "instance_type" {
   description = "Terraformer EC2 instance will run on this type."
   type        = string
