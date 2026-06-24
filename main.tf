@@ -68,9 +68,9 @@ resource "aws_instance" "terraformer" {
   tags = merge(
     {
       Name : "terraformer"
-      InspectorEc2Exclusion : "true",
       module_version : local.module_version
     },
+    var.inspector_ec2_exclusion ? { InspectorEc2Exclusion : "true" } : {},
     local.tags
   )
   metadata_options {
