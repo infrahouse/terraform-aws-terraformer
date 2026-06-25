@@ -40,7 +40,7 @@ that the Terraformer needs to assume.
 ```hcl
 module "terraformer" {
   source  = "registry.infrahouse.com/infrahouse/terraformer/aws"
-  version = "1.0.1"
+  version = "1.1.0"
 
   ssh_key_name = aws_key_pair.test.key_name
   zone_id      = data.aws_route53_zone.test_zone.zone_id
@@ -77,7 +77,7 @@ module "terraformer" {
 |------|--------|---------|
 | <a name="module_profile"></a> [profile](#module\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 1.9.0 |
 | <a name="module_terraformer_ssh_key"></a> [terraformer\_ssh\_key](#module\_terraformer\_ssh\_key) | registry.infrahouse.com/infrahouse/secret/aws | 1.1.1 |
-| <a name="module_userdata"></a> [userdata](#module\_userdata) | registry.infrahouse.com/infrahouse/cloud-init/aws | 2.2.2 |
+| <a name="module_userdata"></a> [userdata](#module\_userdata) | registry.infrahouse.com/infrahouse/cloud-init/aws | 2.3.1 |
 
 ## Resources
 
