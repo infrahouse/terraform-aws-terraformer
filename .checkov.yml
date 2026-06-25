@@ -1,0 +1,43 @@
+# Checkov configuration for the terraform-aws-terraformer module.
+
+framework:
+  - terraform
+
+skip-path:
+  # Test harness fixtures, not part of the published module.
+  - test_data
+
+skip-check:
+  # CKV_TF_1 / CKV_TF_2: InfraHouse modules are pinned to exact versions from the
+  # private registry (registry.infrahouse.com), not commit hashes. This is the
+  # documented InfraHouse standard; Renovate manages version updates via PRs.
+  - CKV_TF_1
+  - CKV_TF_2
+
+  # CKV_AWS_111 / CKV_AWS_107 / CKV_AWS_356: the instance profile policy
+  # (aws_iam_policy_document.permissions) grants sts:AssumeRole and iam:GetRole on
+  # "*". This is the entire purpose of the Terraformer: it must be able to assume
+  # any role whose trust policy references it, for cross-account and admin
+  # operations. The resource cannot be scoped to specific ARNs without defeating
+  # the module's reason to exist.
+  - CKV_AWS_111
+  - CKV_AWS_107
+  - CKV_AWS_356
+
+  # CKV_AWS_158: KMS encryption on the Terraformer CloudWatch log group. The log
+  # group is already encrypted at rest with the AWS-managed key; a dedicated CMK
+  # is disproportionate for puppet/bootstrap logs and adds key-management burden.
+  - CKV_AWS_158
+
+  # CKV_AWS_126: detailed (1-minute) EC2 monitoring. The Terraformer is a single
+  # administrative instance; basic monitoring is sufficient and avoids the
+  # per-instance CloudWatch cost of detailed monitoring.
+  - CKV_AWS_126
+
+  # CKV_AWS_135: EBS optimization. instance_type is consumer-configurable and not
+  # every instance family supports the explicit ebs_optimized flag; modern
+  # defaults (t3) are EBS-optimized at the hardware level already.
+  - CKV_AWS_135
+
+compact: true
+quiet: false
