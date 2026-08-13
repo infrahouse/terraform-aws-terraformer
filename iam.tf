@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "permissions" {
 
 module "profile" {
   source       = "registry.infrahouse.com/infrahouse/instance-profile/aws"
-  version      = "1.9.0"
+  version      = "2.0.0"
   permissions  = data.aws_iam_policy_document.permissions.json
   profile_name = "terraformer-${random_string.profile-suffix.result}"
 }
