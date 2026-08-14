@@ -55,7 +55,7 @@ module "terraformer" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.5 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.11, < 7.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0, < 7.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.5.0 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | >= 0.9.0 |
@@ -65,7 +65,7 @@ module "terraformer" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.11, < 7.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.0, < 7.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.2.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.5.0 |
 | <a name="provider_time"></a> [time](#provider\_time) | >= 0.9.0 |
@@ -75,7 +75,7 @@ module "terraformer" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_profile"></a> [profile](#module\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 1.9.0 |
+| <a name="module_profile"></a> [profile](#module\_profile) | registry.infrahouse.com/infrahouse/instance-profile/aws | 2.0.0 |
 | <a name="module_terraformer_ssh_key"></a> [terraformer\_ssh\_key](#module\_terraformer\_ssh\_key) | registry.infrahouse.com/infrahouse/secret/aws | 1.1.1 |
 | <a name="module_userdata"></a> [userdata](#module\_userdata) | registry.infrahouse.com/infrahouse/cloud-init/aws | 2.4.0 |
 

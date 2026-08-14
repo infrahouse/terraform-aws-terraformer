@@ -237,9 +237,7 @@ def verify_ec2_describe_tags(instance, aws_region):
     LOG.info("✓ ec2:DescribeTags permission verified")
 
 
-@pytest.mark.parametrize(
-    "aws_provider_version", ["~> 5.62", "~> 6.0"], ids=["aws-5", "aws-6"]
-)
+@pytest.mark.parametrize("aws_provider_version", ["~> 6.0"], ids=["aws-6"])
 def test_module(
     aws_region,
     keep_after,
