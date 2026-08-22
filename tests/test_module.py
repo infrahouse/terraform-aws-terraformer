@@ -14,44 +14,6 @@ from tests.conftest import (
 )
 
 
-def wait_for_puppet_completion(instance, max_wait=600, poll_interval=10):
-    """
-    Wait for Puppet to complete bootstrap on the instance.
-
-    Args:
-        instance: EC2Instance object
-        max_wait: Maximum time to wait in seconds (default: 600 = 10 minutes)
-        poll_interval: Time between checks in seconds (default: 10)
-
-    Raises:
-        AssertionError if Puppet doesn't complete within max_wait
-    """
-    LOG.info(
-        f"Waiting for Puppet to complete bootstrap (up to {max_wait // 60} minutes)..."
-    )
-
-    for attempt in range(max_wait // poll_interval):
-        exit_code, stdout, stderr = instance.execute_command(
-            "test -f /var/run/puppet-done && echo 'done' || echo 'not done'"
-        )
-
-        if exit_code == 0 and stdout.strip() == "done":
-            LOG.info(
-                f"✓ Puppet bootstrap completed (after {(attempt + 1) * poll_interval} seconds)"
-            )
-            return
-
-        LOG.info(
-            f"   Puppet still running (attempt {attempt + 1}/{max_wait // poll_interval})..."
-        )
-        time.sleep(poll_interval)
-
-    assert False, (
-        f"Puppet bootstrap did not complete after {max_wait} seconds. "
-        f"Marker file /var/run/puppet-done not found."
-    )
-
-
 def verify_cloudwatch_integration(
     instance, boto3_session, aws_region, cloudwatch_namespace, log_group_name
 ):
@@ -213,6 +175,70 @@ def verify_cloudwatch_integration(
     LOG.info("✅ All CloudWatch integration tests passed!")
 
 
+def verify_inspector_exclusion_tagged(instance):
+    """
+    Verify the instance launched with the InspectorEc2Exclusion tag.
+
+    The tag defers AWS Inspector findings until security updates are applied, so the first
+    findings describe an already patched host. Check this before waiting for Puppet: once
+    profile::boot_security_upgrade has run, the tag is expected to be gone.
+
+    Args:
+        instance: EC2Instance object
+
+    Raises:
+        AssertionError if the instance launched without the tag
+    """
+    LOG.info("Testing InspectorEc2Exclusion tag is set at launch...")
+
+    tags = instance.tags
+
+    assert tags.get("InspectorEc2Exclusion") == "true", (
+        f"Instance {instance.instance_id} launched without InspectorEc2Exclusion=true, so "
+        f"Inspector will report findings against an unpatched host. Tags: {tags}"
+    )
+
+    LOG.info("✓ InspectorEc2Exclusion tag present at launch")
+
+
+def verify_inspector_exclusion_removed(instance, max_wait=600, poll_interval=15):
+    """
+    Verify Puppet removes the InspectorEc2Exclusion tag once the instance is patched.
+
+    profile::boot_security_upgrade deletes the tag after applying security updates, which
+    needs the ec2:DeleteTags permission granted in iam.tf. A timeout here means either the
+    Puppet profile is not in role::terraformer or that IAM statement is missing.
+
+    Args:
+        instance: EC2Instance object
+        max_wait: Maximum time to wait in seconds (default: 600 = 10 minutes)
+        poll_interval: Time between checks in seconds (default: 15, above the 10 second
+            TTL of the instance describe cache)
+
+    Raises:
+        AssertionError if the tag is still present after max_wait
+    """
+    LOG.info("Waiting for Puppet to remove the InspectorEc2Exclusion tag...")
+
+    for attempt in range(max_wait // poll_interval):
+        if "InspectorEc2Exclusion" not in instance.tags:
+            LOG.info(
+                f"✓ InspectorEc2Exclusion tag removed (after {(attempt + 1) * poll_interval} seconds)"
+            )
+            return
+
+        LOG.info(
+            f"   Tag still present (attempt {attempt + 1}/{max_wait // poll_interval})..."
+        )
+        time.sleep(poll_interval)
+
+    assert False, (
+        f"Puppet did not remove the InspectorEc2Exclusion tag from {instance.instance_id} "
+        f"after {max_wait} seconds. Check that role::terraformer includes "
+        f"profile::boot_security_upgrade and that ec2:DeleteTags is granted."
+    )
+
+
 def verify_ec2_describe_tags(instance, aws_region):
     """
     Verify the instance has ec2:DescribeTags permission.
@@ -313,8 +339,15 @@ def test_module(
         # Create EC2Instance object for the terraformer instance
         instance = EC2Instance(instance_id, region=aws_region, role_arn=test_role_arn)
 
-        # Wait for Puppet to complete before running verifications
-        wait_for_puppet_completion(instance)
+        # Verify the instance launched tagged, before Puppet can remove the tag
+        verify_inspector_exclusion_tagged(instance=instance)
+
+        # cloud-init reports done only after ih-bootstrap, and therefore
+        # `ih-puppet apply`, succeeded
+        instance.wait_for_bootstrap()
+
+        # Verify Puppet removed the exclusion tag once security updates were applied
+        verify_inspector_exclusion_removed(instance=instance)
 
         # Verify CloudWatch integration
         verify_cloudwatch_integration(
