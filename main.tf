@@ -69,8 +69,11 @@ resource "aws_instance" "terraformer" {
     {
       Name : "terraformer"
       module_version : local.module_version
+      # Defer Inspector findings until the instance is patched. Puppet
+      # (profile::boot_security_upgrade) removes this tag once security updates are
+      # applied, so Inspector's first findings describe an already patched host.
+      InspectorEc2Exclusion : "true"
     },
-    var.inspector_ec2_exclusion ? { InspectorEc2Exclusion : "true" } : {},
     local.tags
   )
   metadata_options {
@@ -81,6 +84,11 @@ resource "aws_instance" "terraformer" {
     replace_triggered_by = [
       null_resource.terraformer.id
     ]
+    # Puppet removes InspectorEc2Exclusion after patching. Without this, every apply
+    # re-adds the tag in place and the instance goes dark to Inspector until it is
+    # replaced. ignore_changes does not apply on create, so a fresh instance is still
+    # tagged at launch.
+    ignore_changes = [tags["InspectorEc2Exclusion"]]
   }
 }
 

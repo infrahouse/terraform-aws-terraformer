@@ -147,6 +147,25 @@ The instance profile includes minimal base permissions:
 
 **Why:** Required for CloudWatch agent's ec2tagger to enrich metrics with instance tags.
 
+```json
+{
+  "Effect": "Allow",
+  "Action": "ec2:DeleteTags",
+  "Resource": "arn:aws:ec2:*:<account-id>:instance/*",
+  "Condition": {
+    "ForAllValues:StringEquals": {
+      "aws:TagKeys": ["InspectorEc2Exclusion"]
+    },
+    "StringEquals": {
+      "ec2:ResourceTag/created_by_module": "infrahouse/terraformer/aws"
+    }
+  }
+}
+```
+
+**Why:** Lets Puppet remove the `InspectorEc2Exclusion` tag once security updates are applied. Scoped to that
+single tag key, on instances created by this module only. See [Vulnerability Scanning](#vulnerability-scanning).
+
 ### Adding Permissions
 
 For additional operations (e.g., S3 state access):
@@ -368,6 +387,51 @@ metadata_options {
 
 **Why:** Protects against SSRF attacks that could retrieve IAM credentials.
 
+## Vulnerability Scanning
+
+### Deferred Inspector Findings
+
+The instance launches tagged with `InspectorEc2Exclusion`:
+
+```hcl
+tags = merge(
+  {
+    Name : "terraformer"
+    module_version : local.module_version
+    InspectorEc2Exclusion : "true"
+  },
+  local.tags
+)
+```
+
+**Why:** AWS Inspector scans a freshly launched instance before `unattended-upgrades` has applied security
+updates. Those findings close on the next upgrade, but by then they have already reopened their vulnerability
+group, and a group reopened that way breaks the remediation SLA. Deferring finding creation until the instance
+is patched means Inspector's first findings describe an already patched host.
+
+Puppet (`profile::boot_security_upgrade`) removes the tag once security updates are applied, using the
+`ec2:DeleteTags` permission above. From that point the instance is scanned like any other.
+
+!!! warning "This is not a permanent exclusion"
+    Do not rely on `InspectorEc2Exclusion` to keep the Terraformer out of Inspector. Puppet deletes the tag on
+    the first boot after security updates are applied.
+
+### Terraform Drift
+
+`aws_instance.terraformer` manages tags per instance, so Puppet deleting the tag would read as drift and every
+`terraform apply` would re-add it in place — leaving the instance invisible to Inspector until its next reboot.
+The module ignores that single tag key to prevent it:
+
+```hcl
+lifecycle {
+  ignore_changes = [tags["InspectorEc2Exclusion"]]
+}
+```
+
+`ignore_changes` does not apply on create, so a fresh instance is still tagged at launch. It does mean an
+already running instance is not tagged retroactively when you upgrade the module — the deferral takes effect at
+the next instance replacement.
+
 ## Audit and Compliance
 
 ### CloudWatch Logs
@@ -437,4 +501,5 @@ module "terraformer" {
 - [ ] Auto-recovery alarms active
 - [ ] VPC endpoints configured for AWS services
 - [ ] CloudTrail enabled in all accounts
+- [ ] Puppet manifest includes `profile::boot_security_upgrade` so `InspectorEc2Exclusion` is removed after patching
 - [ ] Regular security audits of assumed roles

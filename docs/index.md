@@ -28,6 +28,7 @@ This Terraform module creates a dedicated EC2 instance ("Terraformer") for admin
 - **Auto-Recovery** with CloudWatch alarms for hardware/software failures
 - **Auto-Rotating SSH Keys** with 90-day rotation (stored in Secrets Manager)
 - **CloudWatch Integration** for logs and custom metrics
+- **Deferred Inspector Findings** until first-boot security updates are applied
 - **IAM Profile** with AssumeRole permissions for cross-account operations
 - **VPC Security** with restricted ICMP and SSH access
 - **Puppet Integration** for instance configuration

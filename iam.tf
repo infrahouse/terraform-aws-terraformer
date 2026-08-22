@@ -38,6 +38,22 @@ data "aws_iam_policy_document" "permissions" {
     actions   = ["ec2:DescribeTags"]
     resources = ["*"]
   }
+  # Allows Puppet (profile::boot_security_upgrade) to remove the
+  # InspectorEc2Exclusion tag from this instance once security updates are applied.
+  statement {
+    actions   = ["ec2:DeleteTags"]
+    resources = ["arn:aws:ec2:*:${data.aws_caller_identity.current.account_id}:instance/*"]
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "aws:TagKeys"
+      values   = ["InspectorEc2Exclusion"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/created_by_module"
+      values   = [local.tags.created_by_module]
+    }
+  }
 }
 
 module "profile" {
