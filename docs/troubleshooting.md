@@ -487,6 +487,36 @@ Instance launches but Puppet fails to configure it properly.
      apply /opt/puppet-code/environments/production/manifests/site.pp
    ```
 
+### apt-get update fails: NO_PUBKEY FC9CA96ACA026560
+
+**Problem:**
+```
+W: GPG error: https://apt.releases.hashicorp.com noble InRelease: The following signatures couldn't be verified
+   because the public key is not available: NO_PUBKEY FC9CA96ACA026560
+E: The repository 'https://apt.releases.hashicorp.com noble InRelease' is not signed.
+Error: /Stage[init]/Apt::Update/Exec[apt_update]: '/usr/bin/apt-get update' returned 100 instead of one of [0]
+```
+
+Every Puppet resource after it is then skipped "because of failed dependencies".
+
+**Cause:**
+
+HashiCorp rotated its package signing key on 2026-09-09
+([HCSEC-2026-33](https://discuss.hashicorp.com/t/hcsec-2026-33-hashicorp-linux-signing-gpg-key-update-ca026560/77734)),
+with no overlap period. Module versions up to 3.0.1 bake the previous key into user data.
+
+**Solution:**
+
+Upgrade to 4.0.0 or later. Puppet now configures the HashiCorp repository and re-fetches its signing key on
+every run, so a future rotation heals on the next Puppet run. The upgrade replaces the instance.
+
+To unblock a running instance without replacing it, install the current key where cloud-init put the old one,
+then run Puppet again:
+```bash
+curl -fsSL https://apt.releases.hashicorp.com/gpg \
+  | sudo gpg --dearmor --yes -o /etc/apt/cloud-init.gpg.d/hashicorp.gpg
+```
+
 ## DNS Issues
 
 ### DNS record not resolving

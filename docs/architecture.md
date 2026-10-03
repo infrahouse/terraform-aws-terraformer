@@ -273,13 +273,13 @@ Two options:
          ▼
 3. Cloud-init executes (user data)
    - Install packages (make, python, git)
-   - Add Hashicorp APT repository
    - Configure Puppet facts
    - Run Puppet agent
    - Create /var/run/puppet-done marker
          │
          ▼
 4. Puppet configures instance
+   - Add Hashicorp APT repository (signing key re-fetched on every run)
    - Install Terraform
    - Install AWS CLI
    - Configure CloudWatch agent

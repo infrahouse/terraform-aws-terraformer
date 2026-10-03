@@ -14,15 +14,10 @@ module "userdata" {
     var.packages
   )
   extra_files = var.extra_files
-  extra_repos = merge(
-    {
-      hashicorp : {
-        source : "deb [signed-by=$KEY_FILE]  https://apt.releases.hashicorp.com ${var.ubuntu_codename} main"
-        key : file("${path.module}/files/DEB-GPG-KEY-hashicorp")
-      }
-    },
-    var.extra_repos
-  )
+  # The HashiCorp repository is not seeded here: Puppet (profile::hashicorp_repo)
+  # owns it and re-fetches the signing key on every run. A key baked into userdata
+  # goes stale on rotation, and HashiCorp rotated with no overlap on 2026-09-09.
+  extra_repos              = var.extra_repos
   puppet_debug_logging     = var.puppet_debug_logging
   puppet_environmentpath   = var.puppet_environmentpath
   puppet_hiera_config_path = var.puppet_hiera_config_path
