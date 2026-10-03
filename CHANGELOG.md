@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0] - 2026-10-03
+
+### Bug Fixes
+
+- Let Puppet own the HashiCorp APT repo instead of bundling its key
+- Drop the unused aws_availability_zones data source
+
 ## [3.0.1] - 2026-09-08
 
 ### Bug Fixes
