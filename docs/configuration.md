@@ -357,6 +357,9 @@ extra_files = {
 
 **Description:** Additional APT repositories to configure.
 
+Do not add the HashiCorp repository here. Puppet manages it and keeps its signing key current, and a second
+source line for it with a different `signed-by` makes `apt-get update` fail.
+
 ```hcl
 extra_repos = {
   docker = {

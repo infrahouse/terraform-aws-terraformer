@@ -67,11 +67,12 @@ The module is organized into focused files by resource type:
    allowing the Terraformer to assume any role whose trust policy references it. Users can extend permissions 
    via `var.extra_instance_profile_permissions`.
 
-2. **Cloud-Init Integration**: Leverages `infrahouse/cloud-init/aws` module for user data generation. 
-   Automatically configures Hashicorp APT repository for Terraform installation and supports Puppet configuration.
+2. **Cloud-Init Integration**: Leverages `infrahouse/cloud-init/aws` module for user data generation
+   and supports Puppet configuration. The Hashicorp APT repository is not seeded here: Puppet
+   (`profile::hashicorp_repo` in puppet-code) configures it and re-fetches its signing key on every run.
 
 3. **Instance Replacement Trigger**: Uses `null_resource.terraformer` with trigger on userdata changes to force 
-   instance replacement when configuration changes (main.tf:65-69).
+   instance replacement when configuration changes (main.tf:90-94).
 
 4. **Ubuntu Pro AMI**: Defaults to latest Ubuntu Pro image via data source, but allows override with `var.ami`.
 
@@ -124,8 +125,8 @@ This module follows InfraHouse integration testing standards:
 - OR modify the base policy in iam.tf:6-15 (requires module version bump)
 
 ### Modifying Cloud-Init Configuration
-- Update module.userdata inputs in main.tf:1-38
-- Instance will be replaced due to lifecycle trigger (main.tf:65-69)
+- Update module.userdata inputs in main.tf:1-48
+- Instance will be replaced due to lifecycle trigger (main.tf:90-94)
 
 ### Before Submitting PR
 1. Run `make format` to format code

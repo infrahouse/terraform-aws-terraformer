@@ -263,6 +263,37 @@ def verify_ec2_describe_tags(instance, aws_region):
     LOG.info("✓ ec2:DescribeTags permission verified")
 
 
+def verify_terraform_from_hashicorp_repo(instance):
+    """
+    Verify Terraform is installed from the HashiCorp APT repository.
+
+    The module no longer seeds that repository through cloud-init; Puppet
+    (profile::hashicorp_repo) configures it and keeps its signing key current.
+    So a Terraform package from apt.releases.hashicorp.com proves Puppet set the
+    repository up, and a finished bootstrap already proves apt_update verified it.
+
+    Args:
+        instance: EC2Instance object
+
+    Raises:
+        AssertionError if terraform is missing or did not come from the HashiCorp repository
+    """
+    LOG.info("Testing Terraform is installed from the HashiCorp APT repository...")
+
+    exit_code, stdout, stderr = instance.execute_command("terraform version")
+    assert exit_code == 0, f"terraform is not runnable. stderr: {stderr}"
+    LOG.info("  %s", stdout.splitlines()[0])
+
+    exit_code, stdout, stderr = instance.execute_command("apt-cache policy terraform")
+    assert exit_code == 0, f"apt-cache policy terraform failed. stderr: {stderr}"
+    assert "apt.releases.hashicorp.com" in stdout, (
+        "terraform is not available from apt.releases.hashicorp.com, so Puppet did not "
+        f"configure the HashiCorp repository. apt-cache policy terraform:\n{stdout}"
+    )
+
+    LOG.info("✓ Terraform installed from the HashiCorp APT repository")
+
+
 @pytest.mark.parametrize("aws_provider_version", ["~> 6.0"], ids=["aws-6"])
 def test_module(
     aws_region,
@@ -348,6 +379,9 @@ def test_module(
 
         # Verify Puppet removed the exclusion tag once security updates were applied
         verify_inspector_exclusion_removed(instance=instance)
+
+        # Verify Puppet configured the HashiCorp repository and installed Terraform
+        verify_terraform_from_hashicorp_repo(instance=instance)
 
         # Verify CloudWatch integration
         verify_cloudwatch_integration(
